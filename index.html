@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security+ SY0-701 Study Command Center</title>
+  <style>
+    :root {
+      --bg-1: #051522;
+      --bg-2: #0d1d2d;
+      --panel: rgba(14, 26, 38, 0.92);
+      --panel-strong: rgba(18, 32, 46, 0.96);
+      --panel-soft: rgba(20, 38, 54, 0.75);
+      --border: rgba(136, 176, 214, 0.25);
+      --text: #eef7ff;
+      --muted: #9bb5c9;
+      --cyan: #5ee0ff;
+      --green: #64e2a0;
+      --red: #ff7d8a;
+      --amber: #ffca65;
+      --purple: #a38cff;
+      --shadow: rgba(0, 0, 0, 0.28);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(94, 224, 255, 0.15), transparent 22%),
+        radial-gradient(circle at bottom right, rgba(163, 140, 255, 0.12), transparent 24%),
+        linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 45%, #07131d 100%);
+      color: var(--text);
+    }
+
+    button, select {
+      font: inherit;
+    }
+
+    button { cursor: pointer; }
+
+    .app {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 20px 40px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+      padding: 12px 2px 8px;
+    }
+
+    .logo h1 {
+      margin: 0;
+      font-size: clamp(1.7rem, 3vw, 2.5rem);
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+    }
+
+    .logo p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--cyan);
+      background: rgba(16, 34, 50, 0.9);
+      border: 1px solid rgba(94, 224, 255, 0.35);
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+      white-space: nowrap;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .navbtn {
+      border: 1px solid var(--border);
+      background: rgba(13, 24, 35, 0.9);
+      color: var(--muted);
+      padding: 10px 15px;
+      border-radius: 12px;
+      transition: 0.2s ease;
+      font-weight: 600;
+    }
+
+    .navbtn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(94, 224, 255, 0.4);
+      color: var(--text);
+    }
+
+    .navbtn.active {
+      background: linear-gradient(135deg, rgba(28, 53, 72, 0.9), rgba(17, 42, 62, 0.95));
+      border-color: rgba(94, 224, 255, 0.4);
+      color: var(--cyan);
+      box-shadow: 0 10px 24px rgba(12, 25, 37, 0.5);
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 18px 20px;
+      box-shadow: 0 18px 36px var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: clamp(1.6rem, 2vw, 2.2rem);
+      margin-top: 8px;
+      letter-spacing: -0.04em;
+    }
+
+    .muted { color: var(--muted); }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(16, 36, 52, 1), rgba(24, 48, 65, 0.96));
+      border: 1px solid rgba(120, 163, 196, 0.28);
+      border-radius: 20px;
+      padding: 24px 24px 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.22);
+    }
+
+    .hero h2 {
+      margin: 0 0 8px;
+      font-size: clamp(1.5rem, 2.4vw, 2.2rem);
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 680px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .primary, .secondary, .danger {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-weight: 700;
+      transition: 0.18s ease;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--cyan), #79f0c8);
+      color: #04131d;
+      box-shadow: 0 12px 22px rgba(94, 224, 255, 0.28);
+    }
+
+    .primary:hover { transform: translateY(-1px); }
+
+    .secondary {
+      background: rgba(20, 49, 67, 0.8);
+      color: var(--text);
+      border: 1px solid rgba(95, 136, 177, 0.45);
+    }
+
+    .danger {
+      background: rgba(62, 22, 31, 0.9);
+      color: #ffb8c0;
+      border: 1px solid rgba(255, 125, 138, 0.45);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .domain { margin: 18px 0; }
+
+    .domain-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 0.96rem;
+    }
+
+    .bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(20, 36, 50, 0.95);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), var(--green));
+      border-radius: inherit;
+      box-shadow: 0 0 18px rgba(94, 224, 255, 0.25);
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: clamp(1.2rem, 2vw, 1.7rem);
+      letter-spacing: -0.04em;
+    }
+
+    .quiz-layout { max-width: 860px; margin: 0 auto; }
+
+    .question-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.87rem;
+      margin-bottom: 16px;
+    }
+
+    .question {
+      font-size: clamp(1.1rem, 2vw, 1.45rem);
+      line-height: 1.5;
+      margin: 12px 0 18px;
+      letter-spacing: -0.01em;
+    }
+
+    .option {
+      display: block;
+      width: 100%;
+      background: rgba(12, 22, 31, 0.92);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 14px 16px;
+      text-align: left;
+      margin: 10px 0;
+      transition: 0.18s ease;
+      line-height: 1.35;
+    }
+
+    .option:hover {
+      background: rgba(17, 31, 44, 0.96);
+      border-color: rgba(94, 224, 255, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .option.selected {
+      background: rgba(14, 42, 58, 0.96);
+      border-color: rgba(94, 224, 255, 0.75);
+      box-shadow: inset 0 0 0 1px rgba(94, 224, 255, 0.2);
+    }
+
+    .option.correct {
+      background: rgba(20, 60, 45, 0.95);
+      border-color: rgba(100, 226, 160, 0.8);
+    }
+
+    .option.wrong {
+      background: rgba(66, 28, 35, 0.95);
+      border-color: rgba(255, 125, 138, 0.7);
+    }
+
+    .explanation {
+      margin-top: 18px;
+      padding: 16px 18px;
+      background: rgba(13, 36, 45, 0.95);
+      border-left: 4px solid var(--cyan);
+      border-radius: 10px;
+      line-height: 1.6;
+      color: var(--text);
+    }
+
+    .hidden { display: none !important; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 18px 0 20px;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.87rem;
+      margin-bottom: 7px;
+      font-weight: 600;
+    }
+
+    select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: rgba(11, 22, 31, 0.96);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 11px 12px;
+      outline: none;
+    }
+
+    .flashcard {
+      min-height: 246px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      background: linear-gradient(145deg, rgba(20, 38, 52, 0.98), rgba(14, 27, 38, 0.96));
+      border: 1px solid rgba(120, 163, 196, 0.35);
+      border-radius: 20px;
+      padding: 30px 24px;
+      cursor: pointer;
+      box-shadow: inset 0 0 20px rgba(255,255,255,0.02);
+    }
+
+    .flashcard h3 {
+      font-size: clamp(1.5rem, 2vw, 2.1rem);
+      margin: 12px 0 8px;
+      letter-spacing: -0.04em;
+    }
+
+    .flashback {
+      color: var(--green);
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      line-height: 1.7;
+      max-width: 550px;
+    }
+
+    .review-item {
+      padding: 16px 4px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .review-item:last-child { border-bottom: 0; }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.74rem;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(22, 54, 73, 0.8);
+      color: #a7ddff;
+      margin-bottom: 8px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .good { color: var(--green); }
+    .bad { color: var(--red); }
+
+    .empty {
+      text-align: center;
+      padding: 28px 18px;
+      color: var(--muted);
+      border: 1px dashed rgba(255,255,255,0.12);
+      border-radius: 12px;
+      background: rgba(13, 23, 32, 0.45);
+    }
+
+    footer {
+      text-align: center;
+      color: #6b8aa5;
+      font-size: 0.8rem;
+      padding: 28px 0 0;
+    }
+
+    @media (max-width: 800px) {
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      header { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 560px) {
+      .app { padding: 18px 14px 30px; }
+      .grid, .controls { grid-template-columns: 1fr; }
+      .card { padding: 16px; }
+      .question { font-size: 1.1rem; }
+      .hero { padding: 18px 16px; }
+      .badge { font-size: 0.7rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="logo">
+        <h1>🛡 Security+ Study Command Center</h1>
+        <p>SY0-701 • Practice • Review • Retain</p>
+      </div>
+      <div class="badge">Local progress enabled</div>
+    </header>
+
+    <nav>
+      <button class="navbtn active" data-page="dashboard">Dashboard</button>
+      <button class="navbtn" data-page="practice">Practice</button>
+      <button class="navbtn" data-page="flashcards">Flashcards</button>
+      <button class="navbtn" data-page="mistakes">Review Mistakes</button>
+    </nav>
+
+    <section id="dashboard" class="page active">
+      <div class="hero">
+        <h2>Ready to train?</h2>
+        <p>
+          Attack weak security domains with targeted drills, review key concepts in flashcards,
+          and reinforce the topics you miss until they stick.
+        </p>
+        <div class="actions">
+          <button class="primary" onclick="quickQuiz()">Start 10-question drill</button>
+          <button class="secondary" onclick="showPage('practice')">Choose a domain</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card stat">
+          <span class="muted">Answered</span>
+          <strong id="answeredStat">0</strong>
+        </div>
+        <div class="card stat">
+          <span class="muted">Accuracy</span>
+          <strong id="accuracyStat">0%</strong>
+        </div>
+        <div class="card stat">
+          <span class="muted">Correct</span>
+          <strong id="correctStat">0</strong>
+        </div>
+        <div class="card stat">
+          <span class="muted">Need review</span>
+          <strong id="mistakeStat">0</strong>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="section-title">
+          <div>
+            <h2>Domain progress</h2>
+            <span class="muted">Performance by security domain</span>
+          </div>
+        </div>
+        <div id="domainProgress"></div>
+      </div>
+    </section>
+
+    <section id="practice" class="page">
+      <div id="quizSetup" class="card quiz-layout">
+        <h2>Practice quiz</h2>
+        <p class="muted">Choose a domain or mix all five categories.</p>
+
+        <div class="controls">
+          <div>
+            <label>Domain</label>
+            <select id="domainSelect">
+              <option value="All">All domains</option>
+              <option>General Security Concepts</option>
+              <option>Threats, Vulnerabilities, and Mitigations</option>
+              <option>Security Architecture</option>
+              <option>Security Operations</option>
+              <option>Security Program Management and Oversight</option>
+            </select>
+          </div>
+          <div>
+            <label>Questions</label>
+            <select id="countSelect">
+              <option value="5">5 questions</option>
+              <option value="10" selected>10 questions</option>
+              <option value="20">20 questions</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="primary" onclick="startQuiz()">Start quiz</button>
+      </div>
+
+      <div id="quizArea" class="card quiz-layout hidden">
+        <div class="question-meta">
+          <span id="qProgress"></span>
+          <span id="qDomain"></span>
+        </div>
+
+        <div id="qText" class="question"></div>
+        <div id="options"></div>
+
+        <div id="explanation" class="explanation hidden"></div>
+
+        <div class="actions">
+          <button id="checkBtn" class="primary" onclick="checkAnswer()">Check answer</button>
+          <button id="nextBtn" class="primary hidden" onclick="nextQuestion()">Next question</button>
+          <button class="secondary" onclick="quitQuiz()">Exit</button>
+        </div>
+      </div>
+
+      <div id="results" class="card quiz-layout hidden"></div>
+    </section>
+
+    <section id="flashcards" class="page">
+      <div class="card">
+        <div class="section-title">
+          <div>
+            <h2>Flashcards</h2>
+            <span class="muted">Tap to reveal the answer.</span>
+          </div>
+          <span id="flashCount" class="badge"></span>
+        </div>
+
+        <div id="flashcard" class="flashcard" onclick="flipCard()"></div>
+
+        <div class="actions">
+          <button class="secondary" onclick="previousCard()">← Previous</button>
+          <button class="primary" onclick="nextCard()">Next →</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="mistakes" class="page">
+      <div class="card">
+        <div class="section-title">
+          <div>
+            <h2>Mistake review</h2>
+            <span class="muted">Questions answered incorrectly</span>
+          </div>
+          <button class="danger" onclick="clearProgress()">Reset progress</button>
+        </div>
+        <div id="mistakeList"></div>
+      </div>
+    </section>
+
+    <footer>
+      Security+ SY0-701 Study Command Center • Version 2 • Progress saved locally in your browser
+    </footer>
+  </div>
+
+  <script>
+    const questions = [
+      { id: 2, domain: "General Security Concepts", q: "A security manager is implementing MFA and patch management. Which two options best describe the control type and category?", options: ["Physical", "Managerial", "Detective", "Administrator", "Preventative", "Technical"], answer: [4,5], multi: true, explanation: "The source guide identifies MFA and patch management as preventative and technical controls." },
+      { id: 3, domain: "General Security Concepts", q: "Which method would most likely be used to identify legacy systems?", options: ["Bug bounty program", "Vulnerability scan", "Package monitoring", "Dynamic analysis"], answer: [1], explanation: "The guide selects vulnerability scanning because scans can identify outdated or unsupported software and systems." },
+      { id: 4, domain: "Threats, Vulnerabilities, and Mitigations", q: "Which attack primarily targets insecure networks?", options: ["Evil twin", "Impersonation", "Watering hole", "Pretexting"], answer: [0], explanation: "The source identifies an evil twin: a fraudulent wireless access point that imitates a legitimate one." },
+      { id: 5, domain: "Security Operations", q: "An administrator wants access to data to be based on users' responsibilities and wants a simplified access structure. What should be used?", options: ["RBAC", "ACL", "SAML", "GPO"], answer: [0], explanation: "The guide selects Role-Based Access Control because permissions are assigned according to roles or responsibilities." },
+      { id: 6, domain: "Security Operations", q: "A company installs cameras and signs warning visitors that recording is taking place. Which two control functions are represented?", options: ["Directive", "Deterrent", "Preventive", "Detective", "Corrective", "Technical"], answer: [1,3], multi: true, explanation: "The source answer is deterrent and detective." },
+      { id: 7, domain: "Threats, Vulnerabilities, and Mitigations", q: "A government worker secretly copies classified defense information and gives it to a corrupt organization. Which motivation best describes this?", options: ["Espionage", "Data exfiltration", "Financial gain", "Blackmail"], answer: [0], explanation: "The guide identifies espionage as the motivation. Data exfiltration describes the act of moving the data rather than the motivation." },
+      { id: 8, domain: "Security Program Management and Oversight", q: "What should a security analyst consider when prioritizing remediation efforts for known vulnerabilities?", options: ["Impact of reporting to executive management", "Overall organizational risk tolerance", "Information gathered from open sources", "Source of the reported risk"], answer: [1], explanation: "The guide emphasizes organizational risk tolerance when determining remediation priorities." },
+      { id: 10, domain: "General Security Concepts", q: "What is required for an organization to properly manage its restore process after a system failure?", options: ["IRP", "DRP", "RPO", "SDLC"], answer: [1], explanation: "The source chooses a Disaster Recovery Plan, which documents procedures for restoring operations after disruptive events." },
+      { id: 12, domain: "General Security Concepts", q: "A company is concerned about client data remaining on decommissioned laptops. What is the most cost-effective method listed to reduce this risk?", options: ["Wiping", "Recycling", "Shredding", "Deletion"], answer: [0], explanation: "The guide selects wiping because secure overwriting can make stored data unrecoverable without physically destroying the device." },
+      { id: 13, domain: "Security Operations", q: "Which action would reduce the number of false positives an analyst must manually review?", options: ["Create playbooks as part of a SOAR platform", "Redefine the patch management process", "Replace an EDR tool with XDR", "Disable AV heuristic scanning"], answer: [0], explanation: "The source associates SOAR playbooks with automation and standardized handling of repetitive alerts." },
+      { id: 14, domain: "Security Architecture", q: "After an incident, an administrator requests a NAC platform. Which listed attack surface is the platform intended to protect?", options: ["Bluetooth", "Wired", "NFC", "SCADA"], answer: [1], explanation: "The guide selects the wired network attack surface and discusses NAC enforcement at network connection points." },
+      { id: 15, domain: "Threats, Vulnerabilities, and Mitigations", q: "Which vulnerability is most likely mitigated by setting up an MDM platform?", options: ["TPM", "Buffer overflow", "Jailbreaking", "SQL injection"], answer: [2], explanation: "The source notes that MDM can detect or restrict jailbroken/rooted mobile devices and enforce device security policies." },
+      { id: 16, domain: "Security Program Management and Oversight", q: "What should be used to select a label for a file based on its value, sensitivity, or applicable regulations?", options: ["Verification", "Certification", "Classification", "Inventory"], answer: [2], explanation: "The guide defines classification as assigning labels based on sensitivity, business value, or regulatory requirements." },
+      { id: 17, domain: "General Security Concepts", q: "Which example represents memory injection?", options: ["Two processes access the same variable, allowing privilege escalation", "Unexpected data causes malicious code to execute", "Malicious code is copied into allocated space of an already-running process", "An executable is overwritten on disk and runs later"], answer: [2], explanation: "The source describes memory injection as malicious code being written into the memory space of an already-running process." },
+      { id: 18, domain: "Threats, Vulnerabilities, and Mitigations", q: "A host becomes infected after an external hard drive is connected. Which training topic should the user review?", options: ["Operational security", "Removable media and cables", "Password management", "Social engineering"], answer: [1], explanation: "The source recommends training concerning removable media and cables." },
+      { id: 19, domain: "General Security Concepts", q: "An organization has many variations of one operating system and wants to standardize before deploying an image. What should it implement first?", options: ["Standard naming convention", "Mashing", "Network diagrams", "Baseline configuration"], answer: [3], explanation: "The guide selects a baseline configuration to establish a standardized system configuration." },
+      { id: 20, domain: "General Security Concepts", q: "Employees bypass Wi-Fi content filtering using another device that provides internet access. What best describes the security risk?", options: ["Host-based security agents are missing", "A rogue access point is allowing users to bypass controls", "Employees are using a hidden SSID", "A valid access point is being jammed"], answer: [1], explanation: "The source identifies the additional unauthorized access point as a rogue access point." },
+      { id: 21, domain: "Security Architecture", q: "Devices cannot connect to the internet or local network for firmware updates; updates must be transferred manually. What architecture best fits?", options: ["Microservices", "Air-gapped", "Software-defined networking", "Serverless"], answer: [1], explanation: "The source describes this as an air-gapped architecture because direct network connectivity is intentionally prevented." },
+      { id: 27, domain: "Security Operations", q: "A SIEM alert concerns suspicious activity on a corporate laptop. The analyst needs details about an executable running on the machine. Which log source is most useful?", options: ["Application", "IPS/IDS", "Network", "Endpoint"], answer: [3], explanation: "The guide selects endpoint logs because they can provide details about local processes and executable activity." },
+      { id: 31, domain: "Threats, Vulnerabilities, and Mitigations", q: "A technician must apply a high-priority patch to a production system. What should be done first?", options: ["Air gap the system", "Move it to another network segment", "Create a change control request", "Apply the patch immediately"], answer: [2], explanation: "The source chooses a change control request so the production change is documented and follows the organization's change process." },
+      { id: 33, domain: "Security Operations", q: "What is a use of CVSS?", options: ["Determine patching cost", "Identify unused ports", "Analyze code for defects", "Prioritize remediation of vulnerabilities"], answer: [3], explanation: "The source describes CVSS as a way to score vulnerability severity and help prioritize remediation." },
+      { id: 35, domain: "Security Program Management and Oversight", q: "A failed change runs beyond its approved window and affects customers. What would help prevent the extended impact from recurring?", options: ["User notification", "Change approval", "Risk analysis", "Backout plan"], answer: [3], explanation: "The guide chooses a backout plan because it provides a documented way to reverse an unsuccessful change." },
+      { id: 39, domain: "General Security Concepts", q: "A website runs in a server cluster, but one server is heavily used while others are nearly idle. What should be configured?", options: ["Server multiprocessing", "Warm site", "Load balancer", "Proxy server"], answer: [2], explanation: "The source selects a load balancer to distribute traffic among multiple servers." }
+    ];
+
+    const flashcards = [
+      ["RBAC", "Restricts access according to a user's role or responsibilities."],
+      ["Evil Twin", "A fraudulent wireless access point that imitates a legitimate access point."],
+      ["DRP", "A disaster recovery plan documents procedures for restoring operations after disruption."],
+      ["SOAR", "Security orchestration, automation, and response; playbooks can automate repetitive security tasks."],
+      ["MDM", "Mobile device management can enforce policies such as configuration, encryption, application restrictions, and jailbreak/root controls."],
+      ["Classification", "Assigns data labels based on sensitivity, value, or regulatory requirements."],
+      ["Air Gap", "Isolation that prevents direct network connectivity and may require controlled manual transfer of updates."],
+      ["FIM", "File integrity monitoring identifies unexpected file changes, including modification or deletion."],
+      ["CVSS", "A scoring framework used to describe vulnerability severity and support remediation prioritization."],
+      ["Backout Plan", "Documented steps for reversing a change when implementation fails or causes unacceptable impact."],
+      ["Load Balancer", "Distributes incoming traffic among systems to avoid overloading one server."],
+      ["Baseline Configuration", "A standardized, approved system configuration used as a reference point."]
+    ];
+
+    const domains = [
+      "General Security Concepts",
+      "Threats, Vulnerabilities, and Mitigations",
+      "Security Architecture",
+      "Security Operations",
+      "Security Program Management and Oversight"
+    ];
+
+    let progress = JSON.parse(localStorage.getItem("secplus-progress") || '{"answered":0,"correct":0,"history":[]}');
+    let currentQuiz = [], currentIndex = 0, selected = [], quizCorrect = 0, locked = false;
+    let flashIndex = 0, flashFlipped = false;
+
+    function save() {
+      localStorage.setItem("secplus-progress", JSON.stringify(progress));
+    }
+
+    function showPage(name) {
+      document.querySelectorAll(".page").forEach((x) => x.classList.remove("active"));
+      document.querySelectorAll(".navbtn").forEach((x) => x.classList.remove("active"));
+      document.getElementById(name).classList.add("active");
+      const b = document.querySelector(`[data-page="${name}"]`);
+      if (b) b.classList.add("active");
+      if (name === "dashboard") renderDashboard();
+      if (name === "mistakes") renderMistakes();
+    }
+
+    document.querySelectorAll(".navbtn").forEach((b) => b.onclick = () => showPage(b.dataset.page));
+
+    function renderDashboard() {
+      document.getElementById("answeredStat").textContent = progress.answered;
+      document.getElementById("correctStat").textContent = progress.correct;
+      document.getElementById("accuracyStat").textContent = progress.answered ? Math.round((progress.correct / progress.answered) * 100) + "%" : "0%";
+
+      const mistakes = [...new Set(progress.history.filter((h) => !h.correct).map((h) => h.id))];
+      document.getElementById("mistakeStat").textContent = mistakes.length;
+
+      const box = document.getElementById("domainProgress");
+      box.innerHTML = domains.map((d) => {
+        const h = progress.history.filter((x) => x.domain === d);
+        const c = h.filter((x) => x.correct).length;
+        const pct = h.length ? Math.round((c / h.length) * 100) : 0;
+        return `
+          <div class="domain">
+            <div class="domain-head">
+              <span>${d}</span>
+              <span>${h.length ? pct + "%" : "Not started"}</span>
+            </div>
+            <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
+          </div>`;
+      }).join("");
+    }
+
+    function shuffle(arr) {
+      return [...arr].sort(() => Math.random() - 0.5);
+    }
+
+    function quickQuiz() {
+      document.getElementById("domainSelect").value = "All";
+      document.getElementById("countSelect").value = "10";
+      showPage("practice");
+      startQuiz();
+    }
+
+    function startQuiz() {
+      const domain = document.getElementById("domainSelect").value;
+      const count = +document.getElementById("countSelect").value;
+      const pool = domain === "All" ? questions : questions.filter((q) => q.domain === domain);
+      currentQuiz = shuffle(pool).slice(0, Math.min(count, pool.length));
+      currentIndex = 0;
+      quizCorrect = 0;
+      document.getElementById("quizSetup").classList.add("hidden");
+      document.getElementById("results").classList.add("hidden");
+      document.getElementById("quizArea").classList.remove("hidden");
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      locked = false;
+      selected = [];
+      const q = currentQuiz[currentIndex];
+      document.getElementById("qProgress").textContent = `Question ${currentIndex + 1} of ${currentQuiz.length}`;
+      document.getElementById("qDomain").textContent = q.domain;
+      document.getElementById("qText").innerHTML = `${q.q}${q.multi ? '<br><small class="muted">Select two.</small>' : ''}`;
+
+      document.getElementById("options").innerHTML = q.options.map((o, i) =>
+        `<button class="option" data-i="${i}" onclick="selectOption(${i})">${String.fromCharCode(65 + i)}. ${o}</button>`
+      ).join("");
+
+      document.getElementById("explanation").classList.add("hidden");
+      document.getElementById("checkBtn").classList.remove("hidden");
+      document.getElementById("nextBtn").classList.add("hidden");
+    }
+
+    function selectOption(i) {
+      if (locked) return;
+      const q = currentQuiz[currentIndex];
+
+      if (q.multi) {
+        if (selected.includes(i)) {
+          selected = selected.filter((x) => x !== i);
+        } else if (selected.length < q.answer.length) {
+          selected.push(i);
+        }
+      } else {
+        selected = [i];
+      }
+
+      document.querySelectorAll(".option").forEach((el, idx) => {
+        el.classList.toggle("selected", selected.includes(idx));
+      });
+    }
+
+    function checkAnswer() {
+      const q = currentQuiz[currentIndex];
+      if (selected.length !== q.answer.length) {
+        alert(q.multi ? "Select the required number of answers." : "Choose an answer first.");
+        return;
+      }
+
+      locked = true;
+      const correct = [...selected].sort().join(",") === [...q.answer].sort().join(",");
+
+      document.querySelectorAll(".option").forEach((el, i) => {
+        el.classList.remove("selected");
+        if (q.answer.includes(i)) el.classList.add("correct");
+        else if (selected.includes(i)) el.classList.add("wrong");
+      });
+
+      if (correct) quizCorrect++;
+
+      progress.answered++;
+      if (correct) progress.correct++;
+      progress.history.push({ id: q.id, domain: q.domain, correct, date: Date.now() });
+      save();
+
+      const exp = document.getElementById("explanation");
+      exp.innerHTML = `<strong class="${correct ? 'good' : 'bad'}">${correct ? '✓ Correct' : '✗ Not quite'}</strong><br><br>${q.explanation}<br><br><span class="muted">Source question #${q.id}</span>`;
+      exp.classList.remove("hidden");
+
+      document.getElementById("checkBtn").classList.add("hidden");
+      document.getElementById("nextBtn").classList.remove("hidden");
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex >= currentQuiz.length) finishQuiz();
+      else renderQuestion();
+    }
+
+    function finishQuiz() {
+      document.getElementById("quizArea").classList.add("hidden");
+      const r = document.getElementById("results");
+      const pct = Math.round((quizCorrect / currentQuiz.length) * 100);
+      r.innerHTML = `
+        <h2>Quiz complete</h2>
+        <div class="stat"><span class="muted">Score</span><strong>${quizCorrect}/${currentQuiz.length} · ${pct}%</strong></div>
+        <p>${pct >= 80 ? "Strong result. Continue reviewing missed concepts." : "Use the mistake review tab to reinforce the topics you missed."}</p>
+        <div class="actions">
+          <button class="primary" onclick="startQuiz()">Try another set</button>
+          <button class="secondary" onclick="showPage('mistakes')">Review mistakes</button>
+        </div>`;
+      r.classList.remove("hidden");
+      document.getElementById("quizSetup").classList.remove("hidden");
+      renderDashboard();
+    }
+
+    function quitQuiz() {
+      document.getElementById("quizArea").classList.add("hidden");
+      document.getElementById("quizSetup").classList.remove("hidden");
+    }
+
+    function renderMistakes() {
+      const wrongIds = [...new Set(progress.history.filter((h) => !h.correct).map((h) => h.id))];
+      const missed = questions.filter((q) => wrongIds.includes(q.id));
+      const box = document.getElementById("mistakeList");
+
+      if (!missed.length) {
+        box.innerHTML = '<div class="empty">No missed questions yet. Complete a quiz to populate this area.</div>';
+        return;
+      }
+
+      box.innerHTML = missed.map((q) => `
+        <div class="review-item">
+          <span class="tag">${q.domain}</span>
+          <strong style="display:block;margin-bottom:8px;">Question #${q.id}: ${q.q}</strong>
+          <span class="good">Source answer: ${q.answer.map((i) => String.fromCharCode(65 + i)).join(", ")}</span>
+          <p class="muted">${q.explanation}</p>
+        </div>`).join("");
+    }
+
+    function renderFlashcard() {
+      const [front, back] = flashcards[flashIndex];
+      document.getElementById("flashCount").textContent = `${flashIndex + 1} / ${flashcards.length}`;
+      document.getElementById("flashcard").innerHTML = flashFlipped
+        ? `<div><span class="muted">Answer</span><p class="flashback">${back}</p></div>`
+        : `<div><span class="muted">Term</span><h3>${front}</h3><span class="muted">Tap to reveal</span></div>`;
+    }
+
+    function flipCard() {
+      flashFlipped = !flashFlipped;
+      renderFlashcard();
+    }
+
+    function nextCard() {
+      flashIndex = (flashIndex + 1) % flashcards.length;
+      flashFlipped = false;
+      renderFlashcard();
+    }
+
+    function previousCard() {
+      flashIndex = (flashIndex - 1 + flashcards.length) % flashcards.length;
+      flashFlipped = false;
+      renderFlashcard();
+    }
+
+    function clearProgress() {
+      if (confirm("Reset all Security+ progress stored in this browser?")) {
+        progress = { answered: 0, correct: 0, history: [] };
+        save();
+        renderDashboard();
+        renderMistakes();
+      }
+    }
+
+    renderDashboard();
+    renderFlashcard();
+  </script>
+</body>
+</html>
