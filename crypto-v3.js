@@ -4,18 +4,17 @@
    ============================================================ */
 
 function CQ(id,domain,text,options,answer,explanation,multi=false){
- const q=Q(
+ return {
   id,
   domain,
-  text,
+  q:text,
   options,
-  answer,
+  answer:Array.isArray(answer)?answer:[answer],
   explanation,
-  multi
- );
- q.crypto=true;
- q.topic="Cryptography & PKI";
- return q;
+  multi,
+  crypto:true,
+  topic:"Cryptography & PKI"
+ };
 }
 
 const cryptoQuestions=[
@@ -301,97 +300,48 @@ flashcards.push(
  ["Homomorphic Encryption","Allows certain operations to be performed while information remains encrypted."],
  ["Self-Signed Certificate","A certificate signed by its own key rather than an external CA."],
  ["TLS","Transport Layer Security — protects network communications."],
- ["Code Signing","Uses cryptographic signatures to provide assurance about software origin and integrity."]
+ ["Code Signing","Uses cryptographic signatures to provide assurance about software origin and integrity."],
+ ["HSM","Hardware Security Module — dedicated hardware for generating and protecting keys."],
+ ["KMS","Key Management System — centrally manages the lifecycle of encryption keys."],
+ ["FDE","Full-Disk Encryption — encrypts an entire storage volume."]
 );
 
-
-/* ============================================================
-   V3 CRYPTO ACRONYMS
-   ============================================================ */
-
-acronyms.push(
- ["PKI","Public Key Infrastructure"],
- ["TPM","Trusted Platform Module"],
- ["HSM","Hardware Security Module"],
- ["KMS","Key Management System"],
- ["OCSP","Online Certificate Status Protocol"],
- ["CRL","Certificate Revocation List"],
- ["CSR","Certificate Signing Request"],
- ["TLS","Transport Layer Security"],
- ["FDE","Full-Disk Encryption"]
-);
+renderFlashcard();
 
 
 /* ============================================================
    V3 CRYPTO PRACTICE MODE
+   Reuses the page's quiz engine (renderQuestion / checkAnswer).
    ============================================================ */
 
-function startCryptoDrill(count=10){
+function startCryptoQuiz(count,timer){
 
- const pool=shuffle(
+ currentQuiz=shuffle(
   questions.filter(q=>q.crypto)
- );
+ ).slice(0,count);
 
- practiceQuestions=
-  pool.slice(0,Math.min(count,pool.length));
-
- practiceIndex=0;
- practiceScore=0;
+ currentIndex=0;
+ quizCorrect=0;
+ timerSeconds=timer;
+ timerRemaining=timer;
 
  showPage("practice");
 
- document
-  .getElementById("practiceSetup")
-  .classList.add("hidden");
+ document.getElementById("quizSetup").classList.add("hidden");
+ document.getElementById("results").classList.add("hidden");
+ document.getElementById("quizArea").classList.remove("hidden");
 
- document
-  .getElementById("practiceResults")
-  .classList.add("hidden");
-
- document
-  .getElementById("practiceQuiz")
-  .classList.remove("hidden");
-
- renderPracticeQuestion();
+ renderQuestion();
 }
 
+/* Untimed 10-question drill */
+function startCryptoDrill(count=10){
+ startCryptoQuiz(count,0);
+}
 
-/* ============================================================
-   V3 CRYPTO EXAM
-   ============================================================ */
-
+/* Timed exam: 20 questions, 60 seconds each */
 function startCryptoExam(count=20){
-
- const pool=shuffle(
-  questions.filter(q=>q.crypto)
- );
-
- examQuestions=
-  pool.slice(0,Math.min(count,pool.length));
-
- examAnswers={};
- examIndex=0;
-
- showPage("exam");
-
- document
-  .getElementById("examSetup")
-  .classList.add("hidden");
-
- document
-  .getElementById("examResults")
-  .classList.add("hidden");
-
- document
-  .getElementById("examArea")
-  .classList.remove("hidden");
-
- clearInterval(timerHandle);
-
- document.getElementById("examTimer").textContent=
-  "Crypto Exam";
-
- renderExamQuestion();
+ startCryptoQuiz(count,60);
 }
 
 
@@ -408,7 +358,7 @@ function getCryptoStats(){
  );
 
  const attempts=
-  state.history.filter(h=>ids.has(h.id));
+  progress.history.filter(h=>ids.has(h.id));
 
  const correct=
   attempts.filter(h=>h.correct).length;
@@ -425,11 +375,11 @@ function getCryptoStats(){
 
 
 /* Extend the existing dashboard */
-const v2RenderDashboard=renderDashboard;
+const baseRenderDashboard=renderDashboard;
 
 renderDashboard=function(){
 
- v2RenderDashboard();
+ baseRenderDashboard();
 
  const stats=getCryptoStats();
 
@@ -440,10 +390,11 @@ renderDashboard=function(){
   crypto=document.createElement("div");
 
   crypto.id="cryptoMasteryV3";
-  crypto.className="card section";
+  crypto.className="card";
+  crypto.style.marginTop="16px";
 
   const domainCard=
-   document.querySelector("#dashboard .card.section");
+   document.getElementById("domainProgress").parentElement;
 
   domainCard.insertAdjacentElement(
    "afterend",
@@ -452,7 +403,7 @@ renderDashboard=function(){
  }
 
  crypto.innerHTML=`
-  <div class="section-head">
+  <div class="section-title">
    <div>
     <h2>🔐 Cryptography & PKI</h2>
     <span class="muted">
@@ -462,7 +413,7 @@ renderDashboard=function(){
   </div>
 
   <div class="domain">
-   <div class="domain-row">
+   <div class="domain-head">
     <span>Crypto Mastery</span>
     <span>
      ${
@@ -528,6 +479,7 @@ const cryptoPracticeButton=
  document.createElement("button");
 
 cryptoPracticeButton.className="secondary";
+cryptoPracticeButton.style.marginLeft="8px";
 
 cryptoPracticeButton.innerHTML=
  "🔐 Crypto-Only Drill";
@@ -537,5 +489,8 @@ cryptoPracticeButton.onclick=()=>{
 };
 
 document
- .querySelector("#practiceSetup .actions")
+ .querySelector("#quizSetup")
  .appendChild(cryptoPracticeButton);
+
+
+renderDashboard();
